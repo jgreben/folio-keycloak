@@ -16,12 +16,6 @@ Build application with:
 docker build -t folio-keycloak .
 ```
 
-Run keycloak using command
-
-```shell
-cd ..
-./dc.sh up -d keycloak
-```
 
 ### Additional variables for container
 
