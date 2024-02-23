@@ -18,31 +18,45 @@ function generateKeystore() {
     fi
   fi
 
-  keytool -keystore $keystore \
-    -storetype BCFKS \
-    -providername BCFIPS \
-    -providerclass org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
-    -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
-    -providerpath /opt/keycloak/providers/bc-fips-*.jar \
-    -alias "$keycloakHost" \
-    -genkeypair -sigalg SHA512withRSA -keyalg RSA -storepass "$keypass" \
-    -dname CN="$keycloakHost" -keypass "$keypass" \
-    -J-Djava.security.properties=/tmp/kc.keystore-create.java.security
+  if [ "$FIPS" = "true" ]; then
+    keytool -keystore $keystore \
+      -storetype BCFKS \
+      -providername BCFIPS \
+      -providerclass org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
+      -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
+      -providerpath /opt/keycloak/providers/bc-fips-*.jar \
+      -alias "$keycloakHost" \
+      -genkeypair -sigalg SHA512withRSA -keyalg RSA -storepass "$keypass" \
+      -dname CN="$keycloakHost" -keypass "$keypass" \
+      -J-Djava.security.properties=/tmp/kc.keystore-create.java.security
+  else
+    keytool -genkeypair -alias "$keycloakHost" \
+      -keyalg RSA \
+      -keysize 2048 \
+      -validity 365 \
+      -keystore $keystore \
+      -dname "CN=$keycloakHost" \
+      -storepass "$keypass"
+  fi
 }
 
 function checkKeystore() {
-  keytool -list -keystore $keystore \
-    -storetype BCFKS \
-    -providername BCFIPS \
-    -providerclass org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
-    -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
-    -providerpath /opt/keycloak/providers/bc-fips-*.jar \
-    -storepass "$keypass" \
-    -J-Djava.security.properties=/tmp/kc.keystore-create.java.security
+  if [ "$FIPS" = "true" ]; then
+    keytool -list -keystore $keystore \
+      -storetype BCFKS \
+      -providername BCFIPS \
+      -providerclass org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
+      -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
+      -providerpath /opt/keycloak/providers/bc-fips-*.jar \
+      -storepass "$keypass" \
+      -J-Djava.security.properties=/tmp/kc.keystore-create.java.security
+  else
+    keytool -list -keystore $keystore \
+      -storepass "$keypass"
+  fi
 }
 
-echo "$(date +%F' '%T,%3N) INFO  [$script] Generating BCFKS keystore for hostname: '$keycloakHost'"
+echo "$(date +%F' '%T,%3N) INFO  [$script] Generating  keystore for hostname: '$keycloakHost'"
 if generateKeystore; then
-  echo "$(date +%F' '%T,%3N) INFO  [$script] BCFKS keystore generation finished."
+  echo "$(date +%F' '%T,%3N) INFO  [$script]  keystore generation finished."
 fi
-
