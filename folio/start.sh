@@ -7,18 +7,19 @@ if [[ -z "$KC_FOLIO_BE_ADMIN_CLIENT_SECRET" ]]; then
   exit 1
 fi
 
-# Generate BCFKS keystore
-/opt/keycloak/bin/folio/keystore.sh &
-
 /opt/keycloak/bin/folio/configure-realms.sh &
 
 if [[ "$FIPS" == "true" ]]; then
   echo "Starting in FIPS mode"
   /opt/keycloak/bin/kc.sh start \
-   --optimized --https-key-store-password=${KC_HTTPS_KEY_STORE_PASSWORD} \
+   --optimized --http-enabled=false --https-key-store-type=BCFKS \
+   --https-key-store-file="${KC_HTTPS_KEY_STORE:-/opt/keycloak/conf/test.server.keystore}" --https-key-store-password=${KC_HTTPS_KEY_STORE_PASSWORD:-SecretPassword} \
    --spi-password-hashing-pbkdf2-sha256-max-padding-length=14 \
-   -Djava.security.properties=/opt/keycloak/conf/kc.java.security
+   --log-level=INFO,org.keycloak.common.crypto:TRACE,org.keycloak.crypto:TRACE \
+   -Djava.security.properties=/opt/keycloak/conf/java.security
 else
-  echo "Starting in non-FIPS mode"
-  /opt/keycloak/bin/kc.sh start --optimized --https-key-store-password=${KC_HTTPS_KEY_STORE_PASSWORD}
+  /opt/keycloak/bin/kc.sh start \
+   --optimized --http-enabled=false --https-key-store-type=BCFKS \
+   --https-key-store-file="${KC_HTTPS_KEY_STORE:-/opt/keycloak/conf/test.server.keystore}" --https-key-store-password="${KC_HTTPS_KEY_STORE_PASSWORD:-SecretPassword}" \
+   --log-level=INFO,org.keycloak.common.crypto:TRACE,org.keycloak.crypto:TRACE
 fi
