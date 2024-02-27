@@ -29,4 +29,3 @@ RUN chmod -R 550 /opt/keycloak/bin/folio
 USER keycloak
 
 ENTRYPOINT ["/opt/keycloak/bin/folio/start.sh"]
-#ENTRYPOINT ["/bin/bash"]
