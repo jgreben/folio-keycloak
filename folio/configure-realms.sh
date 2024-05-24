@@ -7,7 +7,7 @@ clientSecret="$KC_FOLIO_BE_ADMIN_CLIENT_SECRET"
 
 maxAttempts=50
 attemptCounter=0
-/opt/keycloak/bin/kcadm.sh config truststore --trustpass "${KC_HTTPS_KEY_STORE_PASSWORD:-SecretPassword}" "${KCADM_HTTPS_TRUST_STORE:-/opt/keycloak/conf/test.server.truststore}"
+/opt/keycloak/bin/kcadm.sh config truststore --trustpass "${KCADM_HTTPS_TRUST_STORE_PASSWORD:-SecretPassword}" "${KCADM_HTTPS_TRUST_STORE:-/opt/keycloak/conf/test.server.truststore}"
 
 function loginAsAdmin() {
   /opt/keycloak/bin/kcadm.sh config credentials \
