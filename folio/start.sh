@@ -2,7 +2,7 @@
 # Wrapper script as docker entrypoint to run configure-realms.sh in parallel to actual kc.sh (the official entrypoint).
 
 if [[ -z "$KC_FOLIO_BE_ADMIN_CLIENT_SECRET" ]]; then
-  echo "$(date +%F' '%T,%3N) ERROR [start.sh] Environment variable KC_FOLIO_BE_ADMIN_CLIENT_SECRET is not set, check 
+  echo "$(date +%F' '%T,%3N) ERROR [start.sh] Environment variable KC_FOLIO_BE_ADMIN_CLIENT_SECRET is not set, check
   the configuration"
   exit 1
 fi
@@ -22,4 +22,5 @@ echo "Starting in non FIPS mode"
   --spi-password-hashing-pbkdf2-sha256-max-padding-length=14 \
   --cache="$kcCache" \
   --cache-config-file="$kcCacheConfigFile" \
-  --log-level=INFO,org.keycloak.common.crypto:TRACE,org.keycloak.crypto:TRACE
+  --log-level=INFO,org.keycloak.common.crypto:TRACE,org.keycloak.crypto:TRACE \
+  --hostname="${KC_HOSTNAME}"
